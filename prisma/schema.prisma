@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String?
+  Session  Session[]
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  sessionToken String   @unique
+  expires      DateTime
+}
+
+model Item {
+  id          Int    @id @default(autoincrement())
+  description String
+  userId      Int
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  SIHId          String   @unique
+  DepartmentCode String?
+  DepartmentName String?
+  Dimension1Code String?
+  Dimension2Code String?
+  TotalAmount    Float
+  ProfitAmount   Float
+  TotalSum       Float
+  UserName       String
+  ReferenceNo    String
+  PriceInclVat   Boolean
+  VatRegNo       String?
+  PaidAmount     Float
+  EInvSent       Boolean
+  EInvSentDate   DateTime
+  EmailSent      DateTime
+  Paid           Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
