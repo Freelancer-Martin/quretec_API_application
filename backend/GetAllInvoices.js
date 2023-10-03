@@ -147,5 +147,5 @@ function makeRequest() {
 }
 
 // Schedule the function to run after every minute (60000 milliseconds)
-setInterval(makeRequest, 180000);
+setInterval(makeRequest, 30000);
 //makeRequest();

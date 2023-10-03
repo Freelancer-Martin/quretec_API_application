@@ -13,7 +13,7 @@ const cookieParser = require('cookie-parser');
 const https = require('https');
 const fs = require('fs');
 const cors = require('cors');
-const getinvoisces = require('./backend/GetAllInvoices'); // include the helper.js file
+const makeRequest = require('./backend/GetAllInvoices'); // include the helper.js file
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const crypto = require('crypto');
 //const fetch = require('node-fetch');
@@ -74,9 +74,8 @@ app.get("/dashboard", async (req, res) => {
     if (!token) {
         return res.status(401).json({ error: "Not Authorized" });
     }
-
+    //makeRequest();
     res.sendFile(path.join(__dirname, '/frontend/Views/dashboard.html')); // Adjust the path as needed
-
 
 
 });
@@ -128,7 +127,7 @@ app.post('/update-invoice', async (req, res) => {
         var hash = crypto.createHmac('sha256', ApiKey).update(datastring).digest('base64');
 
         const payload = JSON.stringify(apiPayload);
-
+/*
         var options = {
             hostname: 'aktiva.merit.ee',
             port: 443,
@@ -156,7 +155,7 @@ app.post('/update-invoice', async (req, res) => {
 
         apiReq.write(payload);
         apiReq.end();
-
+*/
         invoiceSender.sendInvoice(updatedInvoice, function (error, response) {
             if (error) {
                 console.error('An error occurred:', error);
@@ -307,7 +306,7 @@ app.post('/logout', (req, res) => {
     res.clearCookie('authToken');
     res.json({ message: 'Logged out' });
 });
-
+/*
 // Array of invoices as an example
 let invoices = [
     {
@@ -321,7 +320,7 @@ let invoices = [
         TotalAmount: 150.00
     }
 ];
-
+*/
 // PUT endpoint to update a specific invoice
 app.put('/invoice/:id', (req, res) => {
     // Extract the invoice ID from the URL parameters
@@ -342,6 +341,33 @@ app.put('/invoice/:id', (req, res) => {
     res.send(invoice);
 });
 
+app.delete('/invoice/:id', async (req, res) => {  // <-- notice the `async` keyword here
+    const { id } = req.params;    // Extract the invoice ID from the URL parameters
+
+    try {
+        // Delete the invoice from the database
+        await prisma.invoice.delete({
+            where: {
+                id: id
+            }
+        });
+
+        // Send a 204 No Content response to indicate success
+        res.status(204).send();
+    } catch (error) {
+        // If an error occurs (e.g., invoice not found), send a 404 or 500 response
+        if (error.code === 'P2025') { // Prisma's code for record not found
+            //res.status(404).send('Invoice not found');
+        } else {
+            console.error('Error deleting invoice:', error);
+            //res.status(500).send('Server error');
+        }
+    }
+
+    // Send a 204 No Content response to indicate success
+    //res.status(204).send();
+});
+
 // Endpoint to fetch all invoices from the database
 app.get('/invoices', async (req, res) => {
     try {
@@ -351,7 +377,7 @@ app.get('/invoices', async (req, res) => {
         res.status(500).json({ error: 'Error fetching invoices' });
     }
 });
-
+/*
 // Update an item endpoint
 app.put('/items/:id', (req, res) => {
     const itemId = parseInt(req.params.id);
@@ -379,7 +405,7 @@ app.delete('/items/:id', (req, res) => {
     items.splice(itemIndex, 1);
     res.status(204).send();
 });
-
+*/
 
 // Serve Swagger documentation
 const swaggerDocument = yaml.load('swagger.yaml');

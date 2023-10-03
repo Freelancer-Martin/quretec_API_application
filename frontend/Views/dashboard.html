@@ -489,6 +489,7 @@
                     anchor.href = `invoice/${invoice.id}`;
                     anchor.textContent = `Invoice No: ${invoice.InvoiceNo}, Total Amount: ${invoice.TotalAmount}`;
                     listItem.appendChild(anchor);
+                    /*
                     // Create Update button
                     const updateButton = document.createElement('button');
                     updateButton.textContent = 'Update';
@@ -500,7 +501,7 @@
                     deleteButton.textContent = 'Delete';
                     deleteButton.onclick = () => deleteInvoice(invoice.id);
                     listItem.appendChild(deleteButton);
-
+*/
                     invoiceList.appendChild(listItem);
                 });
             })

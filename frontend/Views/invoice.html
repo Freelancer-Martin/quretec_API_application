@@ -63,6 +63,19 @@
         #updateForm button:hover {
             background-color: #45a049;
         }
+        #updateForm #deleteButton {
+            background-color: #f44336; /* red color */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #updateForm #deleteButton:hover {
+            background-color: #d32f2f; /* darker red */
+        }
     </style>
 
 </head>
@@ -103,13 +116,20 @@
         <label for="EInvSent">Electronic Invoice Sent:</label>
         <input type="checkbox" id="EInvSent" name="EInvSent"><br>
         <button type="submit">Update Invoice</button>
+        <button type="button" id="deleteButton">Delete Invoice</button>
     </form>
 </div>
 
 <script>
     window.onload = function () {
         // The URL from where to fetch the invoice data
-        const url = 'https://localhost:3000/api/invoice/52c58d10-5889-4cf3-b0bb-d0595e7e83e2';
+        function getInvoiceIdFromUrl() {
+            const pathSegments = window.location.pathname.split('/');
+            return pathSegments[pathSegments.length - 1];
+        }
+
+        const invoiceId = getInvoiceIdFromUrl();
+        const url = `https://localhost:3000/api/invoice/${invoiceId}`;
 
         // Use the fetch API to get the data
         fetch(url)
@@ -192,6 +212,37 @@
             })
             .catch(error => console.log(error));
 
+    });
+
+    function getInvoiceIdFromUrl() {
+        const pathSegments = window.location.pathname.split('/');
+        return pathSegments[pathSegments.length - 1];
+    }
+
+    document.getElementById('deleteButton').addEventListener('click', function() {
+        const invoiceId = getInvoiceIdFromUrl();
+
+        if(!confirm('Are you sure you want to delete this invoice?')) {
+            return; // If the user clicks "Cancel", do not proceed
+        }
+
+        fetch(`https://localhost:3000/invoice/${invoiceId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if(response.status === 204) {
+                    alert('Invoice deleted successfully');
+                    window.location.href = '/dashboard'; // Redirect to the home page or wherever you'd like
+                } else {
+                    return response.json(); // If there's an error, parse the JSON error message
+                }
+            })
+            .then(data => {
+                if(data && data.message) {
+                    alert('Error: ' + data.message); // Display the error message
+                }
+            })
+            .catch(error => console.error('Error:', error));
     });
 
 
